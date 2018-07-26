@@ -1,0 +1,2 @@
+class VideoWork < Work
+end

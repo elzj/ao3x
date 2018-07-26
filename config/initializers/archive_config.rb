@@ -1,8 +1,13 @@
-# Create a sitewide config from yml files
+# Create a sitewide ArchiveConfig object from yml files
 require 'ostruct'
 require 'yaml'
-hash = YAML.load_file("#{Rails.root}/config/config.yml")[Rails.env]
-if File.exist?("#{Rails.root}/config/local.yml")
-  hash.merge! YAML.load_file("#{Rails.root}/config/local.yml")[Rails.env]
+
+main_config = "#{Rails.root}/config/config.yml"
+# Override options locally
+local_config = "#{Rails.root}/config/local.yml"
+
+hash = YAML.load_file(main_config)[Rails.env] || {}
+if File.exist?(local_config)
+  hash.merge! YAML.load_file(local_config)[Rails.env] || {}
 end
 ::ArchiveConfig = OpenStruct.new(hash.with_indifferent_access).freeze

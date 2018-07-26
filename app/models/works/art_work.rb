@@ -1,0 +1,2 @@
+class ArtWork < Work
+end

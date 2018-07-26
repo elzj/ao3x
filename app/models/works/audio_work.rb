@@ -1,0 +1,2 @@
+class AudioWork < Work
+end

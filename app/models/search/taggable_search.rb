@@ -1,0 +1,2 @@
+module TaggableSearch
+end

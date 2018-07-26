@@ -1,0 +1,2 @@
+class TagSearch < Search
+end

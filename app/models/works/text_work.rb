@@ -1,0 +1,2 @@
+class TextWork < Work
+end
