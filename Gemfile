@@ -62,11 +62,20 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 
-#### Project specific gems
+#### Project specific gems ####
+
+## Testing ##
 
 group :development, :test do
   gem 'rspec-rails', '~> 3.7'
 end
+gem 'spring-commands-rspec', group: :development
+gem 'shoulda-matchers', '3.1.2', group: :test
+
+## Major dependencies ##
 
 gem 'devise', '>=4.3'
 gem 'elasticsearch', '>=6.0.0'
+
+## Utilities ##
+

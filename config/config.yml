@@ -2,6 +2,11 @@ development: &default
   elasticsearch:
     url: 'http://127.0.0.1:9200'
     prefix: 'ao3'
+  users:
+    login_min: 3
+    login_max: 40
+    password_min: 6
+    password_max: 40
 
 test:
   <<: *default
