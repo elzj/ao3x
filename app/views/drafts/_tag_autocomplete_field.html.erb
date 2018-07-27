@@ -1,6 +1,4 @@
 <div class="form-group">
   <%= f.label tag_type %>
-  <%= f.text_field tag_type, class: 'form-control autocomplete tag', id: "draft_#{tag_type}", data: { tagtype: tag_type.to_s.classify } %>
-  <ul id='<%= "draft_#{tag_type}_data" %>'>
-  </ul>
+  <%= f.autocomplete_field tag_type, autocomplete_api_tags_path(type: tag_type.to_s.classify), 'data-delimiter' => ', ', 'class' => 'form-control' %>
 </div>

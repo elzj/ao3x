@@ -79,3 +79,4 @@ gem 'elasticsearch', '>=6.0.0'
 
 ## Utilities ##
 
+gem 'rails-jquery-autocomplete'

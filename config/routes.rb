@@ -6,6 +6,12 @@ Rails.application.routes.draw do
   post '/drafts/new/:stage', to: 'drafts#create'
   patch '/drafts/new/:stage', to: 'drafts#create'
 
+  namespace :api, defaults: { format: :json } do
+    resources :tags, only: [:index, :show] do
+      collection { get :autocomplete }
+    end
+  end
+
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations'

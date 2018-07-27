@@ -144,6 +144,8 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.0.4)
       loofah (~> 2.2, >= 2.2.2)
+    rails-jquery-autocomplete (1.0.4)
+      rails (>= 3.2)
     railties (5.2.0)
       actionpack (= 5.2.0)
       activesupport (= 5.2.0)
@@ -233,6 +235,7 @@ DEPENDENCIES
   mysql2 (>= 0.4.4, < 0.6.0)
   puma (~> 3.11)
   rails (~> 5.2.0)
+  rails-jquery-autocomplete
   rspec-rails (~> 3.7)
   selenium-webdriver
   shoulda-matchers (= 3.1.2)

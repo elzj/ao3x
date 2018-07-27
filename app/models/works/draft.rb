@@ -1,6 +1,6 @@
 class Draft < ApplicationRecord
   belongs_to :user
-  serialize :metadata, JSON
+  serialize :metadata, Hash
 
   WORK_ATTRIBUTES = %w(
     type
@@ -56,10 +56,6 @@ class Draft < ApplicationRecord
   end
 
   ### INSTANCE METHODS ###
-
-  def metadata
-    @metadata ||= attributes['metadata'] || {}
-  end
 
   def set_data(new_data)
     metadata_will_change!
