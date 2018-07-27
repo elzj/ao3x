@@ -13,6 +13,7 @@ class Draft < ApplicationRecord
     restricted
     anon_commenting_disabled
     moderated_commenting_enabled
+    language_id
   ).freeze
 
   TAG_FIELDS = %w(
@@ -25,7 +26,14 @@ class Draft < ApplicationRecord
     freeforms
   ).freeze
 
-  FIELDS = WORK_ATTRIBUTES + TAG_FIELDS + %w(content)
+  FIELDS = WORK_ATTRIBUTES + TAG_FIELDS + %w(
+    chapter
+    series
+    collections
+    cocreators
+    recipients
+    parents
+  )
 
   # Define getter and setter methods for each field that
   # read from and write to the metadata hash
@@ -43,14 +51,34 @@ class Draft < ApplicationRecord
     end
   end
   
-  def self.latest(user_id)
-    where(user_id: user_id).order('updated_at DESC').first
+  def self.for_user(user)
+    where(user_id: user.id).order('updated_at DESC')
   end
 
   ### INSTANCE METHODS ###
 
   def metadata
-    @metadata ||= {}
+    @metadata ||= attributes['metadata'] || {}
+  end
+
+  def set_data(new_data)
+    metadata_will_change!
+    new_data.each_pair do |key, value|
+      send("#{key}=", value) if FIELDS.include?(key.to_s)
+    end
+    self
+  end
+
+  def series_data
+    metadata['series'] || {}
+  end
+
+  def series_title
+    series_data['title']
+  end
+
+  def series_position
+    series_data['position']
   end
 
   def work_data
@@ -58,7 +86,7 @@ class Draft < ApplicationRecord
   end
 
   def chapter_data
-    { 'content' => metadata['content'] }
+    metadata['chapter']
   end
 
   def tag_data

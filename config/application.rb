@@ -16,6 +16,6 @@ module Ao3x
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
 
-    config.autoload_paths += %w(search tags users works).map{ |dir| "#{Rails.root}/app/models/#{dir}" }
+    config.autoload_paths += %w(collections search tags users works).map{ |dir| "#{Rails.root}/app/models/#{dir}" }
   end
 end

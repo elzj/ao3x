@@ -6,7 +6,7 @@ RSpec.describe DraftPoster, type: :model do
       poster = DraftPoster.new(Draft.new)
       expect(poster.valid?).to be_falsey
       expect(poster.errors).to eq(
-        ["Title is missing", "Content is missing", "Fandom is missing", "Rating is missing", "Warning is missing", "Creator is missing"]
+        ["Title is missing", "Fandom is missing", "Rating is missing", "Warning is missing", "Creator is missing"]
       )
     end
   end
@@ -22,7 +22,9 @@ RSpec.describe DraftPoster, type: :model do
     let(:work_info) do
       {
         title: "A new work",
-        content: "With plenty of content",
+        chapter: {
+          content: "With plenty of content",
+        },
         fandoms: "Amazing Fandom",
         ratings: "Not Rated",
         warnings: "No Archive Warnings Apply",
@@ -32,7 +34,7 @@ RSpec.describe DraftPoster, type: :model do
 
     context "without the right data" do
       it "should not save" do
-        draft = Draft.new(work_info.merge(content: "a"))
+        draft = Draft.new(work_info.merge(chapter: { content: "a" }))
         poster = DraftPoster.new(draft)
         expect(poster.post!).to be_falsey
         expect(poster.errors.length).to eq(1)

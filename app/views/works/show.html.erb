@@ -1,2 +1,13 @@
-<h1>Works#show</h1>
-<p>Find me in app/views/works/show.html.erb</p>
+<h1><%= @work.title %></h1>
+
+<div style="margin: 1em 0">
+  <h6>Summary</h6>
+  <%= @work.summary.html_safe %>
+</div>
+
+<% @work.chapters.each do |chapter| %>
+  <div>
+    <h6>Content</h6>
+    <%= chapter.content.html_safe %>
+  </div>
+<% end %>

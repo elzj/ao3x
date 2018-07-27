@@ -1,0 +1,60 @@
+<%= form_for @draft, url: '/drafts/new/tags', html: { class: 'form' } do |f| %>
+
+  <div class="form-group">
+    <%= f.label :title %>
+    <%= f.text_field :title, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :summary %>
+    <%= f.text_area :summary, class: 'form-control' %>
+  </div>
+
+  <p>
+    <a class="btn btn-secondary" data-toggle="collapse" href="#notes" role="button" aria-expanded="false" aria-controls="notes">
+      Add notes
+    </a>
+    <a class="btn btn-secondary" data-toggle="collapse" href="#endnotes" role="button" aria-expanded="false" aria-controls="endnotes">
+      Add end notes
+    </a>    
+  </p>
+
+  <div class="form-group collapse" id="notes">
+    <%= f.label :notes %>
+    <%= f.text_area :notes, class: 'form-control' %>
+  </div>
+
+  <div class="form-group collapse" id="endnotes">
+    <%= f.label :endnotes %>
+    <%= f.text_area :endnotes, class: 'form-control' %>
+  </div>  
+
+  <div class="form-group">
+    <%= f.label :type %>
+    <%= f.select :type, options_for_select(Work::TYPES), class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :language_id, 'Language' %>
+    <%= f.select :language_id, options_for_select(Language.for_posting), class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.check_box :restricted, class: 'form-check-input' %>
+    <%= f.label :restricted, 'Only show your work to registered users', class: 'form-check-label' %>
+  </div>  
+
+  <div class="form-group">
+    <%= f.check_box :anon_commenting_disabled, class: 'form-check-input' %>
+    <%= f.label :anon_commenting_disabled, 'Disable anonymous commenting', class: 'form-check-label' %>
+  </div>  
+
+  <div class="form-group">
+    <%= f.check_box :moderated_commenting_enabled, class: 'form-check-input' %>
+    <%= f.label :moderated_commenting_enabled, 'Enable comment moderation', class: 'form-check-label' %>
+  </div>  
+
+  <%= f.hidden_field :id, value: @draft.id %>
+  <%= f.submit 'Next: Add Tags', class: 'btn btn-primary' %>
+
+<% end %>

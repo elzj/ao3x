@@ -1,5 +1,5 @@
 class DraftPoster
-  REQUIRED_FIELDS = %i(title content fandoms ratings warnings creators)
+  REQUIRED_FIELDS = %i(title fandoms ratings warnings creators)
   attr_reader :draft, :errors
   
   def initialize(draft)

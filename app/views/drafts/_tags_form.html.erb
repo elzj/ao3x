@@ -1,0 +1,22 @@
+<%= form_for @draft, url: '/drafts/new/content', html: { class: 'form' } do |f| %>
+
+  <%= render 'tag_autocomplete_field', f: f, tag_type: :fandoms %>
+  <div class="form-group">
+    <%= f.label :ratings %>
+    <%= f.select :ratings, options_for_select(Rating::DEFAULTS), class: 'form-control' %>
+  </div>
+  <div class="form-group">
+    <%= f.label :warnings %>
+    <%= f.select :warnings, options_for_select(Warning::DEFAULTS), class: 'form-control' %>
+  </div>
+  <div class="form-group">
+    <%= f.label :categories %>
+    <%= f.select :categories, options_for_select(Category::DEFAULTS), class: 'form-control' %>
+  </div>
+  <%= render 'tag_autocomplete_field', f: f, tag_type: :characters %>
+  <%= render 'tag_autocomplete_field', f: f, tag_type: :relationships %>
+  <%= render 'tag_autocomplete_field', f: f, tag_type: :freeforms %>
+
+  <%= f.hidden_field :id, value: @draft.id %>
+  <%= f.submit 'Next: Add Your Work', class: 'btn btn-primary' %>
+<% end %>

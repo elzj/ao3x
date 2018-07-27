@@ -1,0 +1,7 @@
+<div class="container">
+  <h1>
+    Posting <%= @draft.title ? "'#{@draft.title}'" : 'a New Work' %>
+  </h1>
+
+  <%= render_draft_form_part %>
+</div>

@@ -1,5 +1,12 @@
 class Work < ApplicationRecord
 
+  TYPES = [
+    ['Text or Multimedia', 'TextWork'],
+    ['Art', 'ArtWork'],
+    ['Audio', 'AudioWork'],
+    ['Video', 'VideoWork']
+  ]
+
   ### ASSOCIATIONS
   has_many :chapters
   has_many :creatorships, as: :creation
@@ -28,6 +35,11 @@ class Work < ApplicationRecord
   validates :endnotes,
     length: {
       maximum: ArchiveConfig.works[:notes_max]
+    }
+
+  validates :type,
+    inclusion: {
+      in: TYPES.map(&:last)
     }
 
   ### CALLBACKS
