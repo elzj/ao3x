@@ -8,6 +8,6 @@ local_config = "#{Rails.root}/config/local.yml"
 
 hash = YAML.load_file(main_config)[Rails.env] || {}
 if File.exist?(local_config)
-  hash.merge! YAML.load_file(local_config)[Rails.env] || {}
+  hash = hash.deep_merge(YAML.load_file(local_config)[Rails.env] || {})
 end
 ::ArchiveConfig = OpenStruct.new(hash.with_indifferent_access).freeze

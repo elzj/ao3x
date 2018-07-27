@@ -1,4 +1,4 @@
-class Creatorship < ApplicatonRecord
+class Creatorship < ApplicationRecord
   ### ASSOCIATIONS
   belongs_to :pseud
   belongs_to :creation, polymorphic: true

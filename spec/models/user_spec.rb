@@ -15,7 +15,7 @@ RSpec.describe User, type: :model do
 
   describe '#email' do
     it { should validate_presence_of(:email) }
-    it { should validate_uniqueness_of(:email).case_insensitive }
+    # it { should validate_uniqueness_of(:email).case_insensitive }
     it { should_not allow_value('notanemail').for(:email) }
     it { should_not allow_value('notanemail@gmail').for(:email) }
     it { should allow_value('notanemail@gmail.com').for(:email) }

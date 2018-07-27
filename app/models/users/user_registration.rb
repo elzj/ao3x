@@ -1,8 +1,9 @@
 class UserRegistration
   attr_reader :user
   
-  def initialize(user)
-    @user = user
+  def initialize(user_data)
+    @user = User.new(user_data)
+    @errors = []
   end
 
   def save

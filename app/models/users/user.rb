@@ -51,7 +51,7 @@ class User < ApplicationRecord
   end
 
   def default_pseud_id
-    default_pseud.pluck(:id)
+    default_pseud&.id
   end
 
   def current_profile

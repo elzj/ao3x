@@ -3,6 +3,11 @@ class Chapter < ApplicationRecord
   ### ASSOCIATIONS
 
   ### VALIDATIONS
+  validates :content,
+    presence: true,
+    length: {
+      minimum: ArchiveConfig.chapters[:content_min]
+    }
 
   ### CALLBACKS
 
