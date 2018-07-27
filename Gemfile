@@ -80,3 +80,4 @@ gem 'elasticsearch', '>=6.0.0'
 ## Utilities ##
 
 gem 'rails-jquery-autocomplete'
+gem "shrine", "~> 2.0"

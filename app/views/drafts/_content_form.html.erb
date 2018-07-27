@@ -11,6 +11,11 @@
       <%= chapter.label :published_at %>
       <%= chapter.text_field :published_at, class: 'form-control' %>
     <% end %>
+
+    <% if @draft.has_media? %>
+      <%= f.label :media, @draft.media_type %>
+      <%= f.file_field :media, as: :file, class: 'form-control' %>
+    <% end %>
   </div>
 
   <%= f.hidden_field :id, value: @draft.id %>

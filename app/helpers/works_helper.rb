@@ -17,4 +17,19 @@ module WorksHelper
       render 'drafts/basics_form'
     end
   end
+
+  def display_draft_media(draft)
+    case draft.media.metadata['mime_type']
+    when /image/
+      image_tag draft.media_url
+    when /audio/
+      audio_tag draft.media_url, controls: true
+    when /video\/[mp4|ogg|webm]/
+      video_tag draft.media.url, controls: true, width: 640
+    else
+      content_tag :p do
+        link_to "Download", draft.media.url
+      end
+    end
+  end
 end

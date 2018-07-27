@@ -1,5 +1,6 @@
 class Draft < ApplicationRecord
   belongs_to :user
+  include DraftUploader::Attachment.new(:media)
   serialize :metadata, Hash
 
   WORK_ATTRIBUTES = %w(
@@ -94,5 +95,14 @@ class Draft < ApplicationRecord
 
   def creators
     user ? [user.default_pseud_id].compact : []
+  end
+
+  def has_media?
+    metadata['type'] && metadata['type'] != 'TextWork'
+  end
+
+  def media_type
+    return "" unless metadata['type']
+    metadata['type'].split(/Work/).first
   end
 end

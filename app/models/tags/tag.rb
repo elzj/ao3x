@@ -11,7 +11,7 @@ class Tag < ApplicationRecord
   # Given a type and a comma-separated list of tag names, find or create them
   # It's important to return the list in the original order
   def self.process_list(tag_type, tag_string)
-    names = tag_string.split(',').map(&:strip)
+    names = tag_string.split(',').map(&:strip).select{ |name| name.present? }
     tags = Tag.where(name: names).group_by(&:name)
     new_tags = names - tags.keys
     new_tags.each do |name|

@@ -16,6 +16,9 @@ class DraftsController < ApplicationController
   def create
     id = draft_params.delete(:id)
     @draft = Draft.for_user(current_user).find(id) if id.present?
+    if draft_params[:media]
+      @draft.media = draft_params.delete(:media)
+    end
     @draft.set_data(draft_params) if @draft
     @draft ||= Draft.new(draft_params)
     @draft.save!

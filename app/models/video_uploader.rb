@@ -1,0 +1,3 @@
+class VideoUploader < Shrine
+
+end
