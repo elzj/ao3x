@@ -1,5 +1,5 @@
 class Search
-  include SearchHelpers
+  include Searching::Utilities
   attr_reader :options
 
   def self.client

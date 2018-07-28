@@ -1,8 +1,18 @@
 class WorkSearch < Search
-  include TaggableQuery
+  include TaggableSearch
 
   def self.main_indexer
     WorkIndexer
+  end
+
+  def search_results
+    response = search
+    hits = response.dig('hits', 'hits') || []
+    page_count = (response.dig('hits', 'total') / per_page.to_f).ceil
+    {
+      works: WorkBlurb.from_search(hits),
+      page_count: page_count
+    }
   end
 
   # Combine the available filters
@@ -240,7 +250,8 @@ class WorkSearch < Search
   end
 
   def include_restricted?
-    User.current_user.present? || options[:show_restricted]
+    true
+#    User.current_user.present? || options[:show_restricted]
   end
 
   # Include unrevealed works only if we're on a collection page

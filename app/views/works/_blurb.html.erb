@@ -1,0 +1,8 @@
+<div class="works blurb">
+  <h5>
+    <%= link_to work.title, work_path(work) %> by <%= work.creators.to_sentence %>
+  </h5>
+  <h6><%= work.fandom_links.html_safe %></h6>
+  <div><%= work.summary&.html_safe %></div>
+  <p class="tag-list"><%= work.tag_links.html_safe %></p>
+</div>

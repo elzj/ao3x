@@ -1,2 +1,15 @@
-<h1>Works#index</h1>
-<p>Find me in app/views/works/index.html.erb</p>
+<h1>
+  Works
+  <% if params[:q] %>
+    <%= " matching '#{params[:q]}'" %>  
+  <% end %>
+</h1>
+
+<%= form_tag '/works', method: :get, class: "search form-inline" do %>
+  <%= text_field_tag :q %>
+  <%= submit_tag 'Submit', class: "btn btn-primary" %>
+<% end %>
+
+<% @works && @works[:works].each do |work| %>
+  <%= render 'blurb', work: work %>
+<% end %>

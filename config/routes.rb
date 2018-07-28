@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     resources :tags, only: [:index, :show] do
       collection { get :autocomplete }
     end
+    resources :works
   end
 
   devise_for :users, controllers: {
@@ -17,6 +18,6 @@ Rails.application.routes.draw do
     registrations: 'users/registrations'
   }
 
-  root to: 'home#index'
+  root to: 'works#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

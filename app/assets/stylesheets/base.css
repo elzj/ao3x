@@ -1,2 +1,21 @@
 div#main { padding: 1em 0; }
 li.nav-item { margin-left: 1em; }
+
+textarea { height: 8em }
+textarea[name="content"] { height: 20em }
+
+.tag { border-top: 1px solid #ccc }
+.tag dt, .tag dd { float: left; }
+.tag dt { clear: both; margin-right: 0.5em }
+.tag h2 { margin: 0.5em 0 0.5em 0 }
+
+.blurb h5 { font-size: 18px; margin-bottom: 0.25em; }
+.blurb { border-bottom: 1px solid #ccc; padding: 1em; }
+.blurb .tag-list { margin-top: 1em; font-size: 0.8em }
+
+form.search { margin: 1em 0 }
+form.search input { margin: 0.5em 1em 0.5em 0; }
+form.search input[type='text'] { width: 60%; }
+form.search input.autocomplete { width: 30em }
+
+.chapter { margin: 0 20%; font-size: 18px }
