@@ -79,13 +79,11 @@ class Indexer
   end
 
   def self.mapping
-    {
-      document_type: {
-        properties: {
-          # add properties in subclasses
-        }
-      }
-    }
+    mapping_file = File.join(
+      File.dirname(__FILE__),
+      "mappings/#{klass.underscore.pluralize}.json"
+    )
+    JSON.parse(File.read(mapping_file))
   end
 
   def self.settings

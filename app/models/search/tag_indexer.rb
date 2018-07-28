@@ -1,44 +1,11 @@
 class TagIndexer < Indexer
 
+  WHITELISTED_FIELDS = %i(
+    id name merger_id canonical created_at sortable_name
+  ).freeze
+
   def self.klass
     "Tag"
-  end
-
-  def self.mapping
-    {
-      tag: {
-        properties: {
-          name: {
-            type: "text",
-            analyzer: "tag_name_analyzer",
-            fields: {
-              exact: {
-                type:     "text",
-                analyzer: "exact_tag_analyzer"
-              }
-            }
-          },
-          tag_type: { type: "keyword" },
-          sortable_name: { type: "keyword" },
-          uses: { type: "integer" },
-          parent_ids: { type: "keyword" },
-          suggest: {
-            type: "completion",
-            contexts: [
-              { 
-                name: "typeContext",
-                type: "category"
-              },              
-              { 
-                name: "parentContext",
-                type: "category",
-                path: "parent_ids"
-              }
-            ]
-          }
-        }
-      }
-    }
   end
 
   def self.settings
@@ -67,20 +34,11 @@ class TagIndexer < Indexer
   def document(object)
     object.as_json(
       root: false,
-      only: [:id, :name, :merger_id, :canonical, :created_at, :sortable_name]
+      only: WHITELISTED_FIELDS
     ).merge(
       tag_type: object.type,
       uses: object.taggings_count_cache,
-      suggest: {
-        input: object.suggester_tokens,
-        weight: object.suggester_weight,
-        contexts: {
-          typeContext: [
-            object.type,
-            object.canonical? ? "Canonical#{object.type}" : nil
-          ].compact
-        }
-      }
+      suggest: suggester(object)
     ).merge(parent_data(object))
   end
 
@@ -98,5 +56,18 @@ class TagIndexer < Indexer
     #   data["pre_#{key}"] = tag.suggested_parent_ids(parent_type)
     # end
     data
+  end
+
+  def suggester(tag)
+    {
+      input: tag.suggester_tokens,
+      weight: tag.suggester_weight,
+      contexts: {
+        typeContext: [
+          tag.type,
+          tag.canonical? ? "Canonical#{tag.type}" : nil
+        ].compact
+      }
+    }
   end
 end
