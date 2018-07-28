@@ -14,6 +14,7 @@ class DraftPoster
         save_chapter(work)
         save_creatorships(work)
         save_tags(work)
+        draft.destroy
         work
       }
     rescue ActiveRecord::RecordInvalid => e

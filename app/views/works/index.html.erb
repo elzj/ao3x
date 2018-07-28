@@ -1,13 +1,20 @@
 <h1>
   Works
+  <% if @tag %><%= " tagged '#{@tag.name}'" %><% end %>  
   <% if params[:q] %>
     <%= " matching '#{params[:q]}'" %>  
   <% end %>
 </h1>
 
-<%= form_tag '/works', method: :get, class: "search form-inline" do %>
-  <%= text_field_tag :q %>
+<%= form_tag '/works', method: :get, class: "search form" do %>
+  <%= text_field_tag :q, params[:q] %>
   <%= submit_tag 'Submit', class: "btn btn-primary" %>
+  <% if @tag %>
+    <div class="form-item">
+      <%= check_box_tag :tag_id, @tag.id, true %>
+      <%= label_tag :tag_id, "In #{@tag.name}" %>
+    </div>
+  <% end %>
 <% end %>
 
 <% @works && @works[:works].each do |work| %>

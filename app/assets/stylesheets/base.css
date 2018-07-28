@@ -14,8 +14,7 @@ textarea[name="content"] { height: 20em }
 .blurb .tag-list { margin-top: 1em; font-size: 0.8em }
 
 form.search { margin: 1em 0 }
-form.search input { margin: 0.5em 1em 0.5em 0; }
-form.search input[type='text'] { width: 60%; }
+form.search input[type='text'] { margin: 0.5em 1em 0.5em 0; width: 60%; }
 form.search input.autocomplete { width: 30em }
 
 .chapter { margin: 0 20%; font-size: 18px }

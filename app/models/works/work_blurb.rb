@@ -22,39 +22,34 @@ class WorkBlurb < SimpleDelegator
   # Wrap an array of works in blurb objects
   def self.from_works(works)
     work_ids = works.pluck(:id)
+    pseuds = all_pseuds(work_ids)
+    tags = all_tags(work_ids)
     works.map do |work|
       WorkBlurb.new(work).tap { |blurb|
-        blurb.tags = all_tags(work_ids)[work.id]
-        blurb.pseuds = all_pseuds(work_ids)[work.id]
+        blurb.tags = tags[work.id] || []
+        blurb.pseuds = pseuds[work.id] || []
       }
     end
   end
 
   def self.all_tags(work_ids)
-    @tags ||= Tag.all_for_works(work_ids)
+    Tag.all_for_works(work_ids)
   end
 
   def self.all_pseuds(work_ids)
-    @pseuds ||= Pseud.all_for_works(work_ids)
+    Pseud.all_for_works(work_ids)
   end
 
-  attr_writer :tags, :pseuds
-
-  def tags
-    @tags ||= []
-  end
-
-  def pseuds
-    @pseuds ||= []
-  end
+  attr_accessor :tags, :pseuds
 
   def creator_links
     pseuds.map{ |p| creator_link(p) }
   end
 
   def creator_link(pseud)
-    url = url_helpers.user_pseud_url(
+    url = url_helpers.user_pseud_works_url(
       user_id: pseud.user_name,
+      pseud_id: pseud.name,
       id: pseud.name,
       host: ArchiveConfig.host
     )
