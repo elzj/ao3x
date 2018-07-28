@@ -17,7 +17,9 @@ class DraftsController < ApplicationController
     id = draft_params.delete(:id)
     @draft = id.present? ? Draft.for_user(current_user).find(id) :
                            Draft.new
-    @draft.update_from_params(draft_params)
+    unless @draft.update_from_params(draft_params)
+      flash[:error] = @draft.errors.full_messages
+    end
 
     case params[:commit]
     when "Preview Draft"

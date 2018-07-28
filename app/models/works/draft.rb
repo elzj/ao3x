@@ -51,6 +51,16 @@ class Draft < ApplicationRecord
       metadata[field] = value
     end
   end
+
+  ### VALIDATIONS ###
+
+  # Just prevent anything really nutty here
+  validates :metadata,
+    length: {
+      maximum: ArchiveConfig.chapters[:content_max] + 10000
+    }
+
+  ### CLASS METHODS ###
   
   def self.for_user(user)
     where(user_id: user.id).order('updated_at DESC')
@@ -63,7 +73,7 @@ class Draft < ApplicationRecord
       self.media = data.delete(:media)
     end
     set_data(data)
-    save!
+    save
   end
 
   def set_data(new_data)
