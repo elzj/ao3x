@@ -138,6 +138,7 @@ class Search
   def bool_value(str)
     %w(true 1 T).include?(str.to_s)
   end
+  alias_method :b, :bool_value
 
   def exclusion_filters
     @exclusion_filters

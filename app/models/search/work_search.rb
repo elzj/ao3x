@@ -51,10 +51,9 @@ class WorkSearch < Search
   end
 
   def set_language
-    if options[:language_id].present? && options[:language_id].to_i == 0
-      language = Language.find_by(short: options[:language_id])
-      options[:language_id] = language.id if language.present?
-    end
+    lang = options[:language_id]
+    return if lang.blank? || lang.to_i > 0
+    options[:language_id] = Language.where(short: lang).pluck(:id).first
   end
 
   ####################
@@ -63,30 +62,35 @@ class WorkSearch < Search
 
   def visibility_filters
     [
-      posted_filter,
-      hidden_filter,
-      restricted_filter,
-      unrevealed_filter,
-      anon_filter
+      term_filter(:posted, 'true'),
+      term_filter(:hidden_by_admin, 'false'),
+      (term_filter(:restricted, 'false') unless include_restricted?),
+      (term_filter(:in_unrevealed_collection, 'false') unless include_unrevealed?),
+      (term_filter(:in_anon_collection, 'false') unless include_anon?)
     ]
   end
 
   def work_filters
     [
-      complete_filter,
-      single_chapter_filter,
-      language_filter,
-      crossover_filter,
-      type_filter
+      (term_filter(:complete, b(options[:complete]))    if options[:complete].present?),
+      (term_filter(:expected_number_of_chapters, 1)     if options[:single_chapter].present?),
+      (term_filter(:language_id, options[:language_id]) if options[:language_id].present?),
+      (term_filter(:crossover, b(options[:crossover]))  if options[:crossover].present?),
+      (terms_filter(:work_type, options[:work_types])   if options[:work_types]),
     ]
   end
 
   def creator_filters
-    [user_filter, pseud_filter]
+    [
+      (terms_filter(:user_ids, user_ids) if user_ids.present?),
+      (terms_filter(:pseud_ids, pseud_ids) if pseud_ids.present?)
+    ]
   end
 
   def collection_filters
-    [collection_filter]
+    [
+      (terms_filter(:collection_ids, options[:collection_ids]) if options[:collection_ids].present?)
+    ]
   end
 
   def tag_filters
@@ -111,67 +115,9 @@ class WorkSearch < Search
   # FILTERS
   ####################
 
-  def posted_filter
-    term_filter(:posted, 'true')
-  end
-
-  def hidden_filter
-    term_filter(:hidden_by_admin, 'false')
-  end
-
-  def restricted_filter
-    term_filter(:restricted, 'false') unless include_restricted?
-  end
-
-  def unrevealed_filter
-    term_filter(:in_unrevealed_collection, 'false') unless include_unrevealed?
-  end
-
-  def anon_filter
-    term_filter(:in_anon_collection, 'false') unless include_anon?
-  end
-
-  def complete_filter
-    term_filter(:complete, bool_value(options[:complete])) if options[:complete].present?
-  end
-
-  def single_chapter_filter
-    term_filter(:expected_number_of_chapters, 1) if options[:single_chapter].present?
-  end
-
-  def language_filter
-    term_filter(:language_id, options[:language_id]) if options[:language_id].present?
-  end
-
-  def crossover_filter
-    term_filter(:crossover, bool_value(options[:crossover])) if options[:crossover].present?
-  end
-
-  def type_filter
-    terms_filter(:work_type, options[:work_types]) if options[:work_types]
-  end
-
-  def user_filter
-    terms_filter(:user_ids, user_ids) if user_ids.present?
-  end
-
-  def pseud_filter
-    terms_filter(:pseud_ids, pseud_ids) if pseud_ids.present?
-  end
-
-  def collection_filter
-    terms_filter(:collection_ids, options[:collection_ids]) if options[:collection_ids].present?
-  end
-
   def filter_id_filter
     if filter_ids.present?
       filter_ids.map { |filter_id| term_filter(:filter_ids, filter_id) }
-    end
-  end
-
-  def tag_exclusion_filter
-    if exclusion_ids.present?
-      exclusion_ids.map { |exclusion_id| term_filter(:filter_ids, exclusion_id) }
     end
   end
 
@@ -182,6 +128,12 @@ class WorkSearch < Search
   def named_tag_inclusion_filter
     return if included_tag_names.blank?
     match_filter(:tag, included_tag_names.join(" "))
+  end
+
+  def tag_exclusion_filter
+    if exclusion_ids.present?
+      exclusion_ids.map { |exclusion_id| term_filter(:filter_ids, exclusion_id) }
+    end
   end
 
   # This set of filters is used to prevent us from matching any works whose
@@ -201,23 +153,22 @@ class WorkSearch < Search
   def date_range_filter
     date_from = processed_date options[:date_from]
     date_to =   processed_date options[:date_to]
+
     range = {}
     range[:gte] = date_from if date_from
     range[:lte] = date_to if date_to
     range.present? ? { range: { revised_at: range } } : nil
   end
 
-  def processed_date(date_string)
-    date_string.present? && bounded_date(date_string.to_date)
-  rescue ArgumentError
-  end
-
   def word_count_filter
-    return unless options[:words_from].present? || options[:words_to].present?
+    numberfy   = ->(str) { str && str.delete(",._").to_i }
+    words_from = numberfy.call(options[:words_from])
+    words_to   = numberfy.call(options[:words_to])
+
     range = {}
-    range[:gte] = options[:words_from].delete(",._").to_i if options[:words_from].present?
-    range[:lte] = options[:words_to].delete(",._").to_i if options[:words_to].present?
-    { range: { word_count: range } }
+    range[:gte] = words_from if words_from
+    range[:lte] = words_to if words_to
+    range.present? ? { range: { word_count: range } } : nil
   end
 
   ####################
@@ -275,7 +226,8 @@ class WorkSearch < Search
     end
 
     if facet_tags?
-      %w(rating warning category fandom character relationship freeform).each do |facet_type|
+      Tag::TAGGABLE_TYPES.each do |facet_type|
+        facet_type = facet_type.downcase
         aggs[facet_type] = { terms: { field: "#{facet_type}_ids" } }
       end
     end
@@ -318,6 +270,12 @@ class WorkSearch < Search
 
   def pseud_ids
     options[:pseud_ids]
+  end
+
+  # Given a date string, return a date within the acceptable range
+  def processed_date(date_string)
+    date_string.present? && bounded_date(date_string.to_date)
+  rescue ArgumentError
   end
 
   # By default, ES6 expects yyyy-MM-dd and can't parse years with 4+ digits.
