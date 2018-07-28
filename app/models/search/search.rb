@@ -1,4 +1,5 @@
 class Search
+  include SearchHelpers
   attr_reader :options
 
   def self.client
@@ -135,11 +136,6 @@ class Search
     }
   end
 
-  def bool_value(str)
-    %w(true 1 T).include?(str.to_s)
-  end
-  alias_method :b, :bool_value
-
   def exclusion_filters
     @exclusion_filters
   end
@@ -162,61 +158,5 @@ class Search
 
   def pagination_offset
     (page * per_page) - per_page
-  end
-
-  # Only escape if it isn't already escaped
-  def escape_slashes(word)
-    word.gsub(/([^\\])\//) { |s| $1 + '\\/' }
-  end
-
-  def escape_reserved_characters(word)
-    word = escape_slashes(word)
-    word.gsub!('!', '\\!')
-    word.gsub!('+', '\\\\+')
-    word.gsub!('-', '\\-')
-    word.gsub!('?', '\\?')
-    word.gsub!("~", '\\~')
-    word.gsub!("(", '\\(')
-    word.gsub!(")", '\\)')
-    word.gsub!("[", '\\[')
-    word.gsub!("]", '\\]')
-    word.gsub!(':', '\\:')
-    word
-  end
-
-  def split_query_text_phrases(fieldname, text)
-    str = ""
-    return str if text.blank?
-    text.split(",").map(&:squish).each do |phrase|
-      str << " #{fieldname}:\"#{phrase}\""
-    end
-    str
-  end
-
-  def split_query_text_words(fieldname, text)
-    str = ""
-    return str if text.blank?
-    text.split(" ").each do |word|
-      if word[0] == "-"
-        str << " NOT"
-        word.slice!(0)
-      end
-      word = escape_reserved_characters(word)
-      str << " #{fieldname}:#{word}"
-    end
-    str
-  end
-
-  def make_bool(query)
-    query.reject! { |_, value| value.blank? }
-    query[:minimum_should_match] = 1 if query[:should].present?
-
-    if query.values.flatten.size == 1 && (query[:must] || query[:should])
-      # There's only one clause in our boolean, so we might as well skip the
-      # bool and just require it.
-      query.values.flatten.first
-    else
-      { bool: query }
-    end
   end
 end
