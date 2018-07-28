@@ -1,8 +1,14 @@
 <div class="works blurb">
   <h5>
-    <%= link_to work.title, work_path(work) %> by <%= work.creators.to_sentence %>
+    <%= link_to work.title, work_path(work) %>
+    <%= " by " %>
+    <%= link_list_joiner(work.creator_links, sentence: true) %>
   </h5>
-  <h6><%= work.fandom_links.html_safe %></h6>
+  <h6>
+    <%= link_list_joiner(work.fandom_links) %>
+  </h6>
   <div><%= work.summary&.html_safe %></div>
-  <p class="tag-list"><%= work.tag_links.html_safe %></p>
+  <p class="tag-list">
+    <%= link_list_joiner(work.tag_links) %>
+  </p>
 </div>

@@ -1,57 +1,98 @@
 class WorkBlurb < SimpleDelegator
-  FIELDS_FROM_SEARCH = %i(id title summary notes endnotes word_count complete filter_ids revised_at creators)
-
-  FIELDS_FROM_SEARCH.each do |field|
-    define_method(field) { data[field] || super() }
-  end
-
+  delegate :url_helpers, to: 'Rails.application.routes'
+  
+  # Just a fancy way of returning search results
+  # while preserving their original order
   def self.from_search(search_results)
     work_ids = search_results.map{ |hit| hit['_id'] }
-    works    = Work.where(id: work_ids).
-                    inject({}) { |data, work| data[work.id] = work; data }
-    all_tags = Tag.all_for_works(works)
+    works = Work.where(id: work_ids).group_by(&:id)
+    works_in_order = search_results.map{ |hit|
+      work = works[hit['_id'].to_i]&.first
+      ghostbust(hit['_id']) if work.nil?
+      work
+    }.compact
+    from_works(works_in_order)
+  end
 
-    search_results.map do |hit|
-      source = hit['_source']
-      work   = works[hit['_id'].to_i]
-      tags   = all_tags[work.id]
-      WorkBlurb.new_with_data(work, source.merge(preloaded_tags: tags))
+  # Send missing records off to be cleaned up
+  def self.ghostbust(id)
+    GhostbusterJob.perform_later({ type: 'Work', id: id })
+  end
+
+  # Wrap an array of works in blurb objects
+  def self.from_works(works)
+    work_ids = works.pluck(:id)
+    works.map do |work|
+      WorkBlurb.new(work).tap { |blurb|
+        blurb.tags = all_tags(work_ids)[work.id]
+        blurb.pseuds = all_pseuds(work_ids)[work.id]
+      }
     end
   end
 
-  def self.new_with_data(work, data={})
-    new(work).tap {|work| work.data = data.with_indifferent_access }
+  def self.all_tags(work_ids)
+    @tags ||= Tag.all_for_works(work_ids)
   end
 
-  attr_accessor :data
+  def self.all_pseuds(work_ids)
+    @pseuds ||= Pseud.all_for_works(work_ids)
+  end
+
+  attr_writer :tags, :pseuds
+
+  def tags
+    @tags ||= []
+  end
+
+  def pseuds
+    @pseuds ||= []
+  end
+
+  def creator_links
+    pseuds.map{ |p| creator_link(p) }
+  end
+
+  def creator_link(pseud)
+    url = url_helpers.user_pseud_url(
+      user_id: pseud.user_name,
+      id: pseud.name,
+      host: ArchiveConfig.host
+    )
+    { name: pseud.byline, url: url }
+  end
 
   def tag_data
-    if data[:preloaded_tags]
-      data[:preloaded_tags].group_by(&:type)
-    else
-      @tags ||= Tag.where(id: filter_ids).select(:id, :name, :type).group_by(&:type)
+    return {} unless tags.present?
+    tags.inject({}) do |data, tag|
+      data[tag.type] ||= []
+      data[tag.type] << tag_link(tag)
+      data
     end
   end
 
   def tag_links
     types = Tag::TAGGABLE_TYPES - ['Fandom']
-    tag_list = types.map{|type| tag_data[type] }.flatten.compact
-    tag_list.map{ |tag| tag_link(tag) }.join(', ')
+    types.map { |type| tag_data[type] }.flatten.compact
   end
 
   def tag_link(tag)
-    param = "#{tag.id}-#{tag.name[0..20].parameterize}"
-    "<a href='/tags/#{param}/works'>#{tag.name}</a>"
+    url = url_helpers.tag_works_url(
+      tag_id: tag.to_param,
+      host: ArchiveConfig.host
+    )
+    { name: tag.name, url: url }
   end
 
   def fandom_links
-    tag_data['Fandom'] ||= []
-    tag_data['Fandom'].compact.
-                       map{ |tag| tag_link(tag) }.
-                       join(', ')
+    tag_data['Fandom'] || []
   end
 
   def as_json(options=nil)
-    data.slice(*FIELDS_FROM_SEARCH).merge(tags: tag_data)
+    __getobj__.as_json(
+      only: WorkIndexer::WHITELISTED_FIELDS
+    ).merge(
+      tags: tag_data,
+      creators: creator_links
+    )
   end
 end

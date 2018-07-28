@@ -17,6 +17,12 @@ Rails.application.routes.draw do
     resources :works
   end
 
+  resources :users do
+    resources :pseuds do
+      resources :works, only: [:index]
+    end
+  end
+
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations'

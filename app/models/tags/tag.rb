@@ -30,13 +30,17 @@ class Tag < ApplicationRecord
   end
 
   def self.all_for_works(work_ids)
-    Tagging.joins(:tag).
-            where(
-              taggable_type: 'Work',
-              taggable_id: work_ids
-            ).select(
-              "tags.id AS id, tags.name AS name, tags.type AS type, taggable_id AS work_id"
-            ).group_by(&:work_id)
+    tag_select = "tags.id, name, type, taggings.taggable_id AS work_id"
+    conditions = {
+      taggings: {
+        taggable_type: 'Work',
+        taggable_id: work_ids
+      }
+    }
+    Tag.joins(:taggings).
+        where(conditions).
+        select(tag_select).
+        group_by(&:work_id)
   end
 
   ## INSTANCE METHODS
