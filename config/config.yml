@@ -16,6 +16,9 @@ development: &default
     name_min: 1
     name_max: 40
     description_max: 500
+  tags:
+    name_min: 1
+    name_max: 100
   users:
     login_min: 3
     login_max: 40

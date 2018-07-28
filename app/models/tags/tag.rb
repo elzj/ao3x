@@ -5,6 +5,13 @@ class Tag < ApplicationRecord
   has_many :taggings, foreign_key: :tagger_id
 
   ### VALIDATIONS
+  validates :name,
+    presence: true,
+    uniqueness: true,
+    length: {
+      minimum: ArchiveConfig.tags[:name_min],
+      maximum: ArchiveConfig.tags[:name_max]
+    }
 
   ### CALLBACKS
 
