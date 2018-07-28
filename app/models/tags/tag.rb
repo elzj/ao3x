@@ -33,4 +33,8 @@ class Tag < ApplicationRecord
   end
 
   ## INSTANCE METHODS
+
+  def to_param
+    "#{id}-#{name[0..20].parameterize}"
+  end
 end

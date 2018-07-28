@@ -13,6 +13,10 @@ Rails.application.routes.draw do
     resources :works
   end
 
+  resources :tags do
+    resources :works
+  end
+
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations'

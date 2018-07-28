@@ -16,6 +16,10 @@ class WorksController < ApplicationController
   def search_params
     query = {}
     query[:page] = params[:page] if params[:page]
+    if params[:tag_id]
+      @tag = Tag.find(params[:tag_id])
+      query[:filter_ids] = [@tag.id]
+    end
     if params[:q].present?
       query[:query] = params[:q]
     else

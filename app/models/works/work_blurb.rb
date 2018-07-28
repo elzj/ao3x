@@ -40,7 +40,7 @@ class WorkBlurb < SimpleDelegator
   end
 
   def tag_link(tag)
-    param = tag.name.gsub('/', '*s*').gsub('&', '*a*').gsub('.', '*d*').gsub('?', '*q*').gsub('#', '*h*')
+    param = "#{tag.id}-#{tag.name[0..20].parameterize}"
     "<a href='/tags/#{param}/works'>#{tag.name}</a>"
   end
 
