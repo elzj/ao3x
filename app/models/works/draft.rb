@@ -58,6 +58,14 @@ class Draft < ApplicationRecord
 
   ### INSTANCE METHODS ###
 
+  def update_from_params(data)
+    if data[:media]
+      self.media = data.delete(:media)
+    end
+    set_data(data)
+    save!
+  end
+
   def set_data(new_data)
     metadata_will_change!
     new_data.each_pair do |key, value|

@@ -1,4 +1,6 @@
 class Tag < ApplicationRecord
+  TAGGABLE_TYPES = %w(Rating Warning Category Character Relationship Freeform).freeze
+
   ### ASSOCIATIONS
   has_many :taggings, foreign_key: :tagger_id
 

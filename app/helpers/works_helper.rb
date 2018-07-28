@@ -1,7 +1,7 @@
 module WorksHelper
   def tag_list(work)
     names = []
-    ['Rating', 'Warning', 'Category', 'Character', 'Relationship', 'Freeform'].each do |tag_type|
+    Tag::TAGGABLE_TYPES.each do |tag_type|
       if work.tags && work.tags[tag_type]
         names += work.tags[tag_type].pluck(:name)
       end
@@ -25,7 +25,7 @@ module WorksHelper
     when /audio/
       audio_tag draft.media_url, controls: true
     when /video\/[mp4|ogg|webm]/
-      video_tag draft.media.url, controls: true, width: 640
+      video_tag draft.media.url, controls: true
     else
       content_tag :p do
         link_to "Download", draft.media.url
