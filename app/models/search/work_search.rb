@@ -199,15 +199,17 @@ class WorkSearch < Search
   end
 
   def date_range_filter
-    return unless options[:date_from].present? || options[:date_to].present?
-    begin
-      range = {}
-      range[:gte] = clamp_search_date(options[:date_from].to_date) if options[:date_from].present?
-      range[:lte] = clamp_search_date(options[:date_to].to_date) if options[:date_to].present?
-      { range: { revised_at: range } }
-    rescue ArgumentError
-      nil
-    end
+    date_from = processed_date options[:date_from]
+    date_to =   processed_date options[:date_to]
+    range = {}
+    range[:gte] = date_from if date_from
+    range[:lte] = date_to if date_to
+    range.present? ? { range: { revised_at: range } } : nil
+  end
+
+  def processed_date(date_string)
+    date_string.present? && bounded_date(date_string.to_date)
+  rescue ArgumentError
   end
 
   def word_count_filter
@@ -319,7 +321,7 @@ class WorkSearch < Search
   end
 
   # By default, ES6 expects yyyy-MM-dd and can't parse years with 4+ digits.
-  def clamp_search_date(date)
+  def bounded_date(date)
     return date.change(year: 0) if date.year.negative?
     return date.change(year: 9999) if date.year > 9999
     date

@@ -1,8 +1,8 @@
 class Video < ApplicationRecord
-  ### ASSOCIATIONS
-  belongs_to :work
-
+  include Chaptery
   include VideoUploader::Attachment.new(:video)
+
+  ### ASSOCIATIONS
 
   ### VALIDATIONS
 
