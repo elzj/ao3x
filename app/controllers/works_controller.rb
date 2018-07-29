@@ -1,6 +1,9 @@
 class WorksController < ApplicationController
   def index
     @works = WorkSearch.new(search_params).search_results
+    if @works[:error]
+      flash[:error] = @works[:error]
+    end
   end
 
   def show

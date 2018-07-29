@@ -17,17 +17,21 @@ Rails.application.routes.draw do
     resources :works
   end
 
+  devise_for :users, controllers: {
+    sessions: 'users/sessions',
+    registrations: 'users/registrations'
+  }
+
   resources :users do
     resources :pseuds do
       resources :works, only: [:index]
     end
   end
 
-  devise_for :users, controllers: {
-    sessions: 'users/sessions',
-    registrations: 'users/registrations'
-  }
+  get '/r/*path', to: 'home#index', constraints: ->(request) do
+    !request.xhr? && request.format.html?
+  end
 
-  root to: 'works#index'
+  root to: 'home#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

@@ -52,4 +52,14 @@ class Work < ApplicationRecord
   ### CLASS METHODS
 
   ## INSTANCE METHODS
+
+    # 1/1, 2/3, 5/?, etc.
+  def chapter_total_display
+    current = posted? ? chapters.posted.count.to_s : '1'
+    current + '/' + expected_length_display
+  end
+
+  def expected_length_display
+    expected_number_of_chapters.to_s || '?'
+  end
 end

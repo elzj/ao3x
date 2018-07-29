@@ -6,10 +6,12 @@
     <%= csp_meta_tag %>
     <%= javascript_pack_tag 'application' %>
     <%= stylesheet_pack_tag 'application' %>
+
+    <%= stylesheet_link_tag 'sandbox' %>
   </head>
 
   <body>
-    <div class="container">
+    <div class="container" id="archive">
       <%= render 'layouts/header' %>
       <% flash.each do |name, msg| -%>
         <%= content_tag :div, msg, class: (name == 'notice' ? 'alert alert-primary' : 'alert alert-danger') %>

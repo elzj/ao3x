@@ -40,15 +40,24 @@ class WorkBlurb < SimpleDelegator
     Pseud.all_for_works(work_ids)
   end
 
-  attr_accessor :tags, :pseuds
+  attr_writer :tags, :pseuds
+
+  def tags
+    @tags ||= super
+  end
+
+  def pseuds
+    @pseuds ||= super
+  end
 
   def creator_links
     pseuds.map{ |p| creator_link(p) }
   end
 
   def creator_link(pseud)
+    login = pseud.respond_to?(:user_name) ? pseud.user_name : pseud.user.login
     url = url_helpers.user_pseud_works_url(
-      user_id: pseud.user_name,
+      user_id: login,
       pseud_id: pseud.name,
       id: pseud.name,
       host: ArchiveConfig.host
@@ -89,5 +98,9 @@ class WorkBlurb < SimpleDelegator
       tags: tag_data,
       creators: creator_links
     )
+  end
+
+  def to_json(*a)
+    as_json.to_json(*a)
   end
 end

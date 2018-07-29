@@ -7,6 +7,7 @@ class WorkSearch < Search
 
   def search_results
     response = search
+    return response.merge(works: [], page_count: 1) if response[:error]
     hits = response.dig('hits', 'hits') || []
     page_count = (response.dig('hits', 'total') / per_page.to_f).ceil
     {

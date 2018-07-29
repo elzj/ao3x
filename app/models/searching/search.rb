@@ -33,6 +33,10 @@ class Search
       type: document_type,
       body: generated_query
     )
+  rescue Faraday::ConnectionFailed
+    { error: 'Sorry, our search engine is unavailable right now!' }
+  rescue Elasticsearch::Transport::Transport::Errors::BadRequest
+    { error: 'This search failed because of a syntax error. Please try again.' }
   end
 
   def suggest(term, options = {})
