@@ -76,7 +76,7 @@ gem 'shoulda-matchers', '3.1.2', group: :test
 
 ## Major dependencies ##
 
-gem 'devise', '4.6.2'
+gem 'devise', '4.7.1'
 gem 'elasticsearch', '>=6.0.0'
 
 ## Utilities ##
