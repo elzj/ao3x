@@ -19,7 +19,7 @@
     "redux": "^4.0.0",
     "redux-form": "^7.4.2",
     "redux-thunk": "^2.3.0",
-    "set-value": "3.0.1.",
+    "set-value": "4.0.1.",
     "webpack": "^4.39.3"
   },
   "devDependencies": {
